@@ -11,7 +11,7 @@ class Main : public CBase_Main {
 	int i;
 	int j;
 	int k;
-	int temp[1000][1000];
+	double *result;
 
  public:
 

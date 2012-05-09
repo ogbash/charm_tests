@@ -9,12 +9,22 @@ Multiply::Multiply() {}
 
 Multiply::Multiply(CkMigrateMessage *msg) {}
 
-const int T_SIZE = 560;
-double temp_row[T_SIZE * T_SIZE/4];
-double temp_tulemus[T_SIZE][T_SIZE];
+//const int T_SIZE = 2000;
+double *temp_row = NULL;
+void *tulemus = NULL;
 int counter = 0;
 
+void * Multiply::getResultArray(int matrix_size) {
+	if (tulemus==NULL) 
+		tulemus = new double[matrix_size*matrix_size];
+  return tulemus;
+}
+
 void Multiply::multiply(int B_SIZE, double* row, double* column, int matrix_size, int column_number){
+
+	temp_row = new double[B_SIZE];
+	double (*temp_tulemus)[matrix_size] = 
+		(double (*)[matrix_size]) getResultArray(matrix_size);
 
 	int SIZE = matrix_size;
 	for (i = 0; i < SIZE*SIZE/CkNumPes(); i++){			
@@ -37,6 +47,10 @@ void Multiply::multiply(int B_SIZE, double* row, double* column, int matrix_size
 }
 
 void Multiply::multiply_each(int B_SIZE, double* column, int column_number, int matrix_size){
+
+	double (*temp_tulemus)[matrix_size] = (double (*)[matrix_size])
+getResultArray(matrix_size);
+	printf("%p\n", tulemus);
 
 	int SIZE = matrix_size;
 	for (i = 0; i < SIZE/CkNumPes(); i++){

@@ -15,11 +15,13 @@ Main::Main(CkArgMsg* msg) {
     matrix_size = atoi(msg->argv[1]);
   }
 	
-	double matrix_x[matrix_size][matrix_size];
-	double matrix_y[matrix_size][matrix_size];
-	double split_x[CkNumPes()][matrix_size * matrix_size/CkNumPes()];
-	double split_y[CkNumPes()][matrix_size * matrix_size/CkNumPes()];
+	int BLOCK_SIZE = matrix_size*matrix_size/CkNumPes();
+	double (*matrix_x)[matrix_size] = (double (*)[matrix_size])new double[matrix_size*matrix_size];
+	double (*matrix_y)[matrix_size] = (double (*)[matrix_size])new double[matrix_size*matrix_size];
+	double (*split_x)[BLOCK_SIZE] = (double (*)[BLOCK_SIZE]) new double[matrix_size*matrix_size];
+	double (*split_y)[BLOCK_SIZE] = (double (*)[BLOCK_SIZE]) new double[matrix_size*matrix_size];
 	
+	result = new double[matrix_size*matrix_size];
  
 	for (i = 0; i < matrix_size; i++) {
 	  for (j = 0; j < matrix_size; j++) {		
@@ -51,6 +53,8 @@ Main::Main(CkArgMsg* msg) {
 Main::Main(CkMigrateMessage* msg) { }
 
 void Main::save_temp(int SIZE, double *number, int row_number){
+	int matrix_size = 8;
+	double (*temp)[matrix_size] = (double (*)[matrix_size]) result;
 	
 	for(i = 0; i < matrix_size/CkNumPes(); i++){
 		for(j = 0; j < matrix_size; j++) {
@@ -62,17 +66,17 @@ void Main::save_temp(int SIZE, double *number, int row_number){
  	doneCount ++;
 	//CkPrintf("donecount: %d ",doneCount);
 	if (doneCount == CkNumPes()){
-/*
+
 		for (i = 0; i < matrix_size; i++) {
 			CkPrintf("tulemus: ");
 			for (j = 0; j < matrix_size; j++) {
 			
-	  			CkPrintf(" %d ",temp[i][j]);			
+	  			CkPrintf(" %.1f ",temp[i][j]);			
 				
 			}
 			CkPrintf("\n");
 		}
-*/
+
 		CkExit();
 	}
 }
