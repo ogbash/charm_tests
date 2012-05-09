@@ -14,23 +14,30 @@ double *temp_row = NULL;
 void *tulemus = NULL;
 int counter = 0;
 
+void Multiply::store(int B_SIZE, double *row, int matrix_size) {
+	this->matrix_size = matrix_size;
+	temp_row = new double[B_SIZE];
+	int SIZE = matrix_size;
+	for (int i = 0; i < SIZE*SIZE/CkNumPes(); i++){			
+		temp_row[i] = row[i];		
+	}
+
+	mainProxy.ready();
+}
+
 void * Multiply::getResultArray(int matrix_size) {
 	if (tulemus==NULL) 
 		tulemus = new double[matrix_size*matrix_size];
   return tulemus;
 }
 
-void Multiply::multiply(int B_SIZE, double* row, double* column, int matrix_size, int column_number){
+void Multiply::multiply(int B_SIZE, double* column, int column_number){
+	int i,j,k;
 
-	temp_row = new double[B_SIZE];
 	double (*temp_tulemus)[matrix_size] = 
 		(double (*)[matrix_size]) getResultArray(matrix_size);
 
 	int SIZE = matrix_size;
-	for (i = 0; i < SIZE*SIZE/CkNumPes(); i++){			
-		temp_row[i] = row[i];		
-	}
-
 	for (i = 0; i < SIZE/CkNumPes(); i++){
 		for (j = 0; j < SIZE/CkNumPes(); j++){			
 			for (k= 0; k < SIZE; k++){
@@ -41,16 +48,15 @@ void Multiply::multiply(int B_SIZE, double* row, double* column, int matrix_size
 
 
 	for (i = 0; i < CkNumPes()-1; i++){
-		thisProxy[(thisIndex + 1+ i)%CkNumPes()].multiply_each(SIZE * SIZE/CkNumPes(),column, column_number, matrix_size);
+		thisProxy[(thisIndex + 1+ i)%CkNumPes()].multiply_each(SIZE * SIZE/CkNumPes(),column, column_number);
 	}		
 
 }
 
-void Multiply::multiply_each(int B_SIZE, double* column, int column_number, int matrix_size){
+void Multiply::multiply_each(int B_SIZE, double* column, int column_number){
+	int i,j,k;
 
-	double (*temp_tulemus)[matrix_size] = (double (*)[matrix_size])
-getResultArray(matrix_size);
-	printf("%p\n", tulemus);
+	double (*temp_tulemus)[matrix_size] = (double (*)[matrix_size]) getResultArray(matrix_size);
 
 	int SIZE = matrix_size;
 	for (i = 0; i < SIZE/CkNumPes(); i++){

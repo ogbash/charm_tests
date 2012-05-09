@@ -2,8 +2,9 @@ module multiply {
 
   array [1D] Multiply {
     entry Multiply();
-	entry void multiply(int B_SIZE, double row[B_SIZE], double column[B_SIZE], int matrix_size, int column_number);
-	entry void multiply_each(int B_SIZE, double column[B_SIZE], int column_number, int matrix_size);
+	entry void store(int B_SIZE, double row[B_SIZE], int matrix_size);
+	entry void multiply(int B_SIZE, double column[B_SIZE], int column_number);
+	entry void multiply_each(int B_SIZE, double column[B_SIZE], int column_number);
   };
 
 };

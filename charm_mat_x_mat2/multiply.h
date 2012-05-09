@@ -5,9 +5,7 @@ class Multiply : public CBase_Multiply {
 
  public:
 
-	int i;
-	int j;
-	int k;
+	int matrix_size;
 
   Multiply();
   Multiply(CkMigrateMessage *msg);
@@ -15,8 +13,9 @@ class Multiply : public CBase_Multiply {
 	void * getResultArray(int matrix_size);
 
   /// Entry Methods ///
-  void multiply(int B_SIZE, double matrix_x[], double matrix_y[], int row_number, int column_number);	
-	void multiply_each(int B_SIZE, double column[], int column_number, int matrix_size);
+  void store(int B_SIZE, double matrix_x[], int matrix_size);	
+  void multiply(int B_SIZE, double matrix_y[], int column_number);	
+  void multiply_each(int B_SIZE, double column[], int column_number);
 
 };
 

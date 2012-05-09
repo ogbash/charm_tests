@@ -7,11 +7,11 @@ class Main : public CBase_Main {
  private:
   /// Member Variables (Object State) ///
   
+  int readyCount;
   int doneCount;
-	int i;
-	int j;
-	int k;
-	double *result;
+  double *result;
+  double *split_bycol;
+  CProxy_Multiply object_array;
 
  public:
 
@@ -21,7 +21,8 @@ class Main : public CBase_Main {
   Main(CkMigrateMessage* msg);
 
   /// Entry Methods ///
-	void save_temp(int SIZE, double number[], int row_number);
+  void save_temp(int SIZE, double number[], int row_number);
+  void ready();
 
 };
 

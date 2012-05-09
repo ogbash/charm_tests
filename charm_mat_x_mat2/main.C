@@ -7,9 +7,11 @@ CProxy_Main mainProxy;
 
 
 Main::Main(CkArgMsg* msg) {
+  int i,j,k;
 
+  readyCount = 0;
   doneCount = 0;
-  matrix_size = 4;
+  matrix_size = 0;
 	
  if (msg->argc > 1){
     matrix_size = atoi(msg->argv[1]);
@@ -19,7 +21,8 @@ Main::Main(CkArgMsg* msg) {
 	double (*matrix_x)[matrix_size] = (double (*)[matrix_size])new double[matrix_size*matrix_size];
 	double (*matrix_y)[matrix_size] = (double (*)[matrix_size])new double[matrix_size*matrix_size];
 	double (*split_x)[BLOCK_SIZE] = (double (*)[BLOCK_SIZE]) new double[matrix_size*matrix_size];
-	double (*split_y)[BLOCK_SIZE] = (double (*)[BLOCK_SIZE]) new double[matrix_size*matrix_size];
+	split_bycol = new double[matrix_size*matrix_size];
+	double (*split_y)[BLOCK_SIZE] = (double (*)[BLOCK_SIZE]) split_bycol;
 	
 	result = new double[matrix_size*matrix_size];
  
@@ -44,16 +47,33 @@ Main::Main(CkArgMsg* msg) {
 
   CkPrintf("Running with %d elements using %d processors.\n",matrix_size, CkNumPes());
   mainProxy = thisProxy;
-  CProxy_Multiply object_array = CProxy_Multiply::ckNew(CkNumPes());
-	for (i = 0; i < CkNumPes(); i++) {	  
-	  object_array[i].multiply(matrix_size * matrix_size/CkNumPes(), split_x[i],split_y[i],matrix_size,i);	  
-	}
+  object_array = CProxy_Multiply::ckNew(CkNumPes());
+  // distribute
+  for (i = 0; i < CkNumPes(); i++) {	  
+    object_array[i].store(matrix_size * matrix_size/CkNumPes(), split_x[i],matrix_size);	  
+  }
 }
 
 Main::Main(CkMigrateMessage* msg) { }
 
+void Main::ready()  {
+  int i;
+  readyCount += 1;
+  int BLOCK_SIZE = matrix_size*matrix_size/CkNumPes();
+  double (*split_y)[BLOCK_SIZE] = (double (*)[BLOCK_SIZE]) split_bycol;
+
+  if (readyCount == CkNumPes()) {
+    // calculate
+    CkPrintf("Start calculation\n");
+    for (i = 0; i < CkNumPes(); i++) {	  
+      object_array[i].multiply(matrix_size * matrix_size/CkNumPes(), split_y[i],i);	  
+    }
+  }
+}
+
 void Main::save_temp(int SIZE, double *number, int row_number){
-	int matrix_size = 8;
+	int i,j;
+
 	double (*temp)[matrix_size] = (double (*)[matrix_size]) result;
 	
 	for(i = 0; i < matrix_size/CkNumPes(); i++){
@@ -66,7 +86,7 @@ void Main::save_temp(int SIZE, double *number, int row_number){
  	doneCount ++;
 	//CkPrintf("donecount: %d ",doneCount);
 	if (doneCount == CkNumPes()){
-
+/*
 		for (i = 0; i < matrix_size; i++) {
 			CkPrintf("tulemus: ");
 			for (j = 0; j < matrix_size; j++) {
@@ -76,6 +96,7 @@ void Main::save_temp(int SIZE, double *number, int row_number){
 			}
 			CkPrintf("\n");
 		}
+*/
 
 		CkExit();
 	}
