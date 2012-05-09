@@ -1,0 +1,11 @@
+mainmodule main {
+
+  readonly CProxy_Main mainProxy;
+  extern module multiply;
+
+  mainchare Main {
+    entry Main(CkArgMsg* msg);
+		entry void save_temp(int SIZE, double number[SIZE], int row_number);
+  };
+
+};
